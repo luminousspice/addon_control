@@ -2,23 +2,11 @@ import urllib2
 import re
 from BeautifulSoup import BeautifulSoup
 import json
-from addonD import addonD
-from difflib import * 
 
-class FuzzyMatcher():
-
-    def __init__(self):
-        self.pattern = ''
-
-    def setPattern(self, pattern):
-        self.pattern = '.*?'.join(map(re.escape, list(pattern)))
-
-    def score(self, string):
-        match = re.search(self.pattern, string)
-        if match is None:
-            return 0
-        else:
-            return 100.0 / ((1 + match.start()) * (match.end() - match.start() + 1))
+class addonD: 
+    def __init__(self, name1, codeNumber1):
+        self.name=name1
+        self.codeNumber=codeNumber1
 
 # get the web page
 soup = BeautifulSoup(urllib2.urlopen('https://ankiweb.net/shared/addons/').read())
@@ -27,7 +15,7 @@ soup = BeautifulSoup(urllib2.urlopen('https://ankiweb.net/shared/addons/').read(
 jdata = str(soup.find('div', {'id': 'content'}).findAll('script')[1])
 jdata = jdata[24:-29] # gross!! TODO seriously?
 
-
+# make list of addons
 addons = []
 for addon in json.loads(jdata):
     addon_id = addon[0]
@@ -36,13 +24,11 @@ for addon in json.loads(jdata):
     addons.append(thisOne)
 
 
-search_name = raw_input("Name?: ")
-fuzz = FuzzyMatcher()
-fuzz.setPattern(search_name)
-
-matches = [s for s in [addon.name for addon in addons] if re.search(".*?".join(search_name), s)]
-print matches
-
+# find names that match
+search_name = raw_input("Name?: ").lower()
+matches = []
 for addon in addons:
-    print addon.name
-    print fuzz.score(addon.name)
+    if re.search(".*?".join(search_name), addon.name.lower()):
+        matches.append(addon)
+
+print [ (addon.name, addon.codeNumber) for addon in matches]
