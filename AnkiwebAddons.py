@@ -1,56 +1,10 @@
 # import stuff needed to do stuff
+# thanks past david
 import urllib2
 import re
 from BeautifulSoup import BeautifulSoup
 import json
-
-# define abstract classes
-from abc import ABCMeta, abstractmethod
-"""
-This class represents an installable addon. Addons must keep track of whether or
-not they are installed and where they are installed to (if they are)
-
-They also must know how to install themselves to some directory, remove
-themselves, and update themselves should a newer version become available
-(dealing with versions is a subclass responsibility as different repositories
-may need to handle this differently
-"""
-class Addon(object):
-    __metaclass__ = ABCMeta
-
-    def __init__(self):
-        self.installed = False
-        self.installedPath = ""
-
-    @abstractmethod
-    def install(self, path):
-        pass
-
-    @abstractmethod
-    def remove(self):
-        pass
-
-    @abstractmethod
-    def update(self):
-        pass
-
-"""
-This class represents a collection of addons somewhere we would like to be able
-to install plugins from
-
-It will maintain a list of plugins available from the repository. It must be
-able to update this list without on demand
-"""
-class Repository(object):
-    __metaclass__ = ABCMeta
-
-    def __init__(self):
-        self.addons = []
-
-    @abstractmethod
-    def update_addon_list(self):
-        pass
-
+from AddonControl import Addon, Repository
 
 # define ankiweb specific addon stuff
 class AnkiwebAddon(Addon):
@@ -97,19 +51,3 @@ class AnkiwebRepo(Repository):
                 print "ADDING NEW ELEMENT" # for naive test
                 thisOne = AnkiwebAddon(addon_name, addon_id)
                 self.addons.append(thisOne)
-
-
-# TODO extract and put in correct place
-def find_matching_addons(addon_name, addon_list):
-    matches = []
-    for addon in addon_list:
-        if re.search(".*?".join(addon_name), addon.name.lower()):
-            matches.append(addon)
-
-    return matches
-
-# naive test
-repo = AnkiwebRepo()
-repo.update_addon_list()
-print "first time done"
-repo.update_addon_list() # nothing should print
