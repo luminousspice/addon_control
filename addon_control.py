@@ -1,7 +1,3 @@
-# import stuff to make gui
-from aqt import mw
-from aqt.qt import *
-
 # import stuff needed to do stuff
 import urllib2
 import re
@@ -74,7 +70,7 @@ class AnkiwebAddon(Addon):
         self.install()
 
 
-class AnkiwebRepo:
+class AnkiwebRepo(Repository):
     """
     Scrapes the addon list from Ankiweb and updates the repos plugin list
     """
@@ -98,6 +94,7 @@ class AnkiwebRepo:
                 # something
                 pass
             else:
+                print "ADDING NEW ELEMENT" # for naive test
                 thisOne = AnkiwebAddon(addon_name, addon_id)
                 self.addons.append(thisOne)
 
@@ -110,3 +107,9 @@ def find_matching_addons(addon_name, addon_list):
             matches.append(addon)
 
     return matches
+
+# naive test
+repo = AnkiwebRepo()
+repo.update_addon_list()
+print "first time done"
+repo.update_addon_list() # nothing should print
