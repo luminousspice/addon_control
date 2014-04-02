@@ -29,6 +29,10 @@ class Addon(object):
     def update(self):
         pass
 
+    @abstractmethod
+    def load(self):
+        pass
+
 """
 This class represents a collection of addons somewhere we would like to be able
 to install plugins from
@@ -76,9 +80,13 @@ class AddonControl(object):
                 all_addons.append(addon)
         return all_addons
 
-    # TODO probably wrong
     def installed_addons(self):
-        return [addon for addon in [repo.addons for repo in self.repositories] if addon.install == True ]
+        installed_addons = []
+        for repo in self.repositories():
+            for addon in repo.addons:
+                if addon.installed == True:
+                    installed_addons.append(addon)
+        return installed_addons
 
     def fuzzy_search_addons(self, search_name):
         matches = []
@@ -86,3 +94,7 @@ class AddonControl(object):
             if re.search(".*?".join(search_name), addon.name.lower()):
                 matches.append(addon)
         return matches
+    
+    def load_addons(self):
+        for addon in self.installed_addons():
+            addon.load()
