@@ -4,26 +4,42 @@ from aqt.qt import *
 
 from AddonControl import AddonControl, AnkiwebRepo
 
-def setup_repos(control):
-    control.repositories.append( AnkiwebRepo() )
+from PyQt4 import QtCore, QtGui
 
-def testFunction():
-    st = ""
-    for addon in control.all_addons():
-        st += addon.name + '\n'
+class AddonControlWindow(QDialog):
+    def __init__(self):
+        QDialog.__init__(self, mw)
+        self.init_ui()
 
-    showInfo(st)
+    def init_ui(self):
+        okButton = QtGui.QPushButton("OK")
+        cancelButton = QtGui.QPushButton("Cancel")
 
-def doInstall():
-    addon = control.all_addons()[5]
-    print addon.codeNumber
-    control.install_addon(addon)
-    print "installed"
+        hbox = QtGui.QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(okButton)
+        hbox.addWidget(cancelButton)
 
+        vbox = QtGui.QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+        
+        self.setLayout(vbox)    
+        
+        self.setGeometry(300, 300, 300, 150)
+        self.setWindowTitle('Buttons')    
+        self.show()
+
+
+def triggerAddonControl():
+    AddonControlWindow()
+
+# load AddonControl data
 control = AddonControl()
-setup_repos(control)
+control.repositories.append( AnkiwebRepo() )
 control.update_repos()
 
-action = QAction("test", mw)
-mw.connect(action, SIGNAL("triggered()"), doInstall)
+# install UI elements
+action = QAction("AddonControl", mw)
+mw.connect(action, SIGNAL("triggered()"), triggerAddonControl)
 mw.form.menuTools.addAction(action)

@@ -1,5 +1,3 @@
-# import stuff needed to do stuff
-# thanks past david
 import urllib2
 from BeautifulSoup import BeautifulSoup
 import json
@@ -8,7 +6,7 @@ from AddonControl import Addon, Repository
 # ankiqt stuff
 import aqt
 from aqt.downloader import download
-from aqt.qt import showInfo
+from aqt.utils import showInfo
 
 # define ankiweb specific addon stuff
 class AnkiwebAddon(Addon):
@@ -29,13 +27,14 @@ class AnkiwebAddon(Addon):
 
     
     def remove(self):
-        pass # will just delete the directory we installed to
+        print 'Not yet implemented'
+        # remove any files the plugin installs
+        # what else can plugins change that we can track?
 
     # TODO don't be stupid about this
     def update(self):
         self.remove()
         self.install()
-
 
 class AnkiwebRepo(Repository):
     """
