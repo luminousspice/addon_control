@@ -1,10 +1,14 @@
 # import stuff needed to do stuff
 # thanks past david
 import urllib2
-import re
 from BeautifulSoup import BeautifulSoup
 import json
 from AddonControl import Addon, Repository
+
+# ankiqt stuff
+import aqt
+from aqt.downloader import download
+from aqt.qt import showInfo
 
 # define ankiweb specific addon stuff
 class AnkiwebAddon(Addon):
@@ -12,8 +16,17 @@ class AnkiwebAddon(Addon):
         self.name=name
         self.codeNumber=codeNumber
 
+    # TODO be more clever about paths
+    # TODO write custom handler so we can maintain a directory per addon
     def install(self, path):
-        pass # this will probably want to call the thing already in anki to install addons
+        ret = download(aqt.mw, str(self.codeNumber))
+        if not ret:
+            return # TODO error
+        data, fname = ret
+        aqt.mw.progress.finish()
+        aqt.mw.addonManager.install(data, fname)
+        showInfo(_("Download successful. Please restart Anki."))
+
     
     def remove(self):
         pass # will just delete the directory we installed to
@@ -48,6 +61,5 @@ class AnkiwebRepo(Repository):
                 # something
                 pass
             else:
-                print "ADDING NEW ELEMENT" # for naive test
                 thisOne = AnkiwebAddon(addon_name, addon_id)
                 self.addons.append(thisOne)

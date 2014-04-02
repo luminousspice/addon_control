@@ -1,3 +1,4 @@
+import re
 from abc import ABCMeta, abstractmethod
 
 """
@@ -14,7 +15,7 @@ class Addon(object):
 
     def __init__(self):
         self.installed = False
-        self.installedPath = ""
+        self.installed_path = ""
 
     @abstractmethod
     def install(self, path):
@@ -46,20 +47,21 @@ class Repository(object):
         pass
 
 """
-This class is the addon controller, any external interactions with plugin system
+This class is the addon controller, any external interactions with addon system
 should be done by interacting with AddonControl
 """
 class AddonControl(object):
     def __init__(self):
         self.repositories = []
-        self.plugin_path = "" # TODO what should this be
+        self.addon_path = "" # TODO huh
 
     def update_repos(self):
         for repo in self.repositories:
             repo.update_addon_list()
 
     def install_addon(self, addon):
-        addon.install(self.plugin_path)
+        # TODO create better path
+        addon.install(self.addon_path)
 
     def remove_addon(self, addon):
         addon.remove()
@@ -68,7 +70,19 @@ class AddonControl(object):
         addon.update()
 
     def all_addons(self):
-        return [addon for addon in [repo.addons for repo in self.repositories]]
+        all_addons = []
+        for repo in self.repositories:
+            for addon in repo.addons:
+                all_addons.append(addon)
+        return all_addons
 
+    # TODO probably wrong
     def installed_addons(self):
         return [addon for addon in [repo.addons for repo in self.repositories] if addon.install == True ]
+
+    def fuzzy_search_addons(self, search_name):
+        matches = []
+        for addon in self.all_addons():
+            if re.search(".*?".join(search_name), addon.name.lower()):
+                matches.append(addon)
+        return matches
