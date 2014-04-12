@@ -109,7 +109,6 @@ class AddonControl(object):
         return matches
     
     def load_addons(self):
-        print map(lambda a: a.name, self.installed_addons())
         for addon in self.installed_addons():
             addon.load()
 

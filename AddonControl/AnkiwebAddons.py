@@ -70,7 +70,6 @@ class AnkiwebAddon(Addon):
 
     def load(self):
         # we don't care about the addons menu, we have our own
-        print "Loading ", self.name
         sys.path.insert(0, self.installed_path)
         for f in self.files():
             try:
