@@ -1,5 +1,6 @@
 import re
 import os
+import pickle
 import aqt
 from anki.utils import  isWin, isMac
 from abc import ABCMeta, abstractmethod
@@ -59,18 +60,9 @@ This class is the addon controller, any external interactions with addon system
 should be done by interacting with AddonControl
 """
 class AddonControl(object):
-    def __init__(self):
+    def __init__(self, addons_folder):
         self.repositories = []
-
-    def addons_folder(self):
-        dir = aqt.mw.pm.addonFolder()
-        if isWin:
-            dir = dir.encode(sys.getfilesystemencoding())
-        path = os.path.join(dir, "AddonControlAddons")
-        # if the directory doesn't exist make it
-        if not os.path.exists(path):
-            os.makedirs(path)
-        return path
+        self.addons_folder = addons_folder
 
     def update_repos(self):
         for repo in self.repositories:
@@ -79,7 +71,7 @@ class AddonControl(object):
     def install_addon(self, addon):
         # these paths don't reall have to be too sane
         nicer_name = "".join(x for x in addon.name if x.isalnum())
-        addon_path = os.path.join(self.addons_folder(), nicer_name)
+        addon_path = os.path.join(self.addons_folder, nicer_name)
         # if the directory doesn't exist make it
         if not os.path.exists(addon_path):
             os.makedirs(addon_path)
@@ -116,3 +108,17 @@ class AddonControl(object):
     def load_addons(self):
         for addon in self.installed_addons():
             addon.load()
+
+# saving state
+# dumps data controller's directory
+def dump_data(controller):
+    with open(os.path.join(controller.addons_folder, "AddonControlData.pickle"), 'wb') as f:
+        pickle.dump(controller, f)
+
+def load_data(from_where):
+    with open(from_where, 'rb') as f:
+        control = pickle.load(f)
+        for addon in control.all_addons():
+            print addon.name
+            print addon.installed
+        return control
