@@ -1,4 +1,7 @@
 import re
+import os
+import aqt
+from anki.utils import  isWin, isMac
 from abc import ABCMeta, abstractmethod
 
 """
@@ -16,6 +19,7 @@ class Addon(object):
     def __init__(self):
         self.installed = False
         self.installed_path = ""
+        self.name = ""
 
     @abstractmethod
     def install(self, path):
@@ -57,15 +61,29 @@ should be done by interacting with AddonControl
 class AddonControl(object):
     def __init__(self):
         self.repositories = []
-        self.addon_path = "" # TODO huh
+
+    def addons_folder(self):
+        dir = aqt.mw.pm.addonFolder()
+        if isWin:
+            dir = dir.encode(sys.getfilesystemencoding())
+        path = os.path.join(dir, "AddonControlAddons")
+        # if the directory doesn't exist make it
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
 
     def update_repos(self):
         for repo in self.repositories:
             repo.update_addon_list()
 
     def install_addon(self, addon):
-        # TODO create better path
-        addon.install(self.addon_path)
+        # these paths don't reall have to be too sane
+        nicer_name = "".join(x for x in addon.name if x.isalnum())
+        addon_path = os.path.join(self.addons_folder(), nicer_name)
+        # if the directory doesn't exist make it
+        if not os.path.exists(addon_path):
+            os.makedirs(addon_path)
+        addon.install(addon_path)
 
     def remove_addon(self, addon):
         addon.remove()
@@ -82,7 +100,7 @@ class AddonControl(object):
 
     def installed_addons(self):
         installed_addons = []
-        for repo in self.repositories():
+        for repo in self.repositories:
             for addon in repo.addons:
                 if addon.installed == True:
                     installed_addons.append(addon)
@@ -91,7 +109,7 @@ class AddonControl(object):
     def fuzzy_search_addons(self, search_name):
         matches = []
         for addon in self.all_addons():
-            if re.search(".*?".join(search_name), addon.name.lower()):
+            if re.search(".*?".join(search_name.lower()), addon.name.lower()):
                 matches.append(addon)
         return matches
     

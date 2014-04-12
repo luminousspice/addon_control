@@ -2,6 +2,10 @@ import urllib2
 from BeautifulSoup import BeautifulSoup
 import json
 from AddonControl import Addon, Repository
+import os
+from zipfile import ZipFile
+from cStringIO import StringIO
+import sys
 
 # ankiqt stuff
 import aqt
@@ -11,21 +15,45 @@ from aqt.utils import showInfo
 # define ankiweb specific addon stuff
 class AnkiwebAddon(Addon):
     def __init__(self, name, codeNumber):
+        super(AnkiwebAddon,self).__init__()
         self.name=name
         self.codeNumber=codeNumber
 
-    # TODO be more clever about paths
-    # TODO write custom handler so we can maintain a directory per addon
+    # TODO refactor
     def install(self, path):
+        print path
         ret = download(aqt.mw, str(self.codeNumber))
         if not ret:
             return # TODO error
         data, fname = ret
         aqt.mw.progress.finish()
-        aqt.mw.addonManager.install(data, fname)
-        showInfo(_("Download successful. Please restart Anki."))
 
-    
+        if fname.endswith(".py"):
+            # .py files go directly into the addon folder
+            path = os.path.join(path, fname)
+            try:
+                open(path, "w").write(data)
+            except:
+                print "sheeeeiiiiitttt" # TODO vulgar
+            showInfo(_("Download successful. Please restart Anki."))
+            installed = True
+            installed_path = path
+            return
+
+        # .zip file
+        z = ZipFile(StringIO(data))
+        base = path
+        for n in z.namelist():
+            if n.endswith("/"):
+                # folder; ignore
+                continue
+            # write
+            z.extract(n, base)
+
+        showInfo(_("Download successful. Please restart Anki."))
+        self.installed = True
+        self.installed_path = path
+
     def remove(self):
         print 'Not yet implemented'
         # remove any files the plugin installs
@@ -35,6 +63,20 @@ class AnkiwebAddon(Addon):
     def update(self):
         self.remove()
         self.install()
+
+    def files(self):
+        return [f for f in os.listdir(self.installed_path) if f.endswith(".py")]
+
+    def load(self):
+        # we don't care about the addons menu, we have our own
+        print "Loading ", self.name
+        sys.path.insert(0, self.installed_path)
+        print sys.path
+        for f in self.files():
+            try:
+                __import__(f.replace(".py",""))
+            except:
+                print "import failed"
 
 class AnkiwebRepo(Repository):
     """
