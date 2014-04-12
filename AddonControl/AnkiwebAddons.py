@@ -1,11 +1,12 @@
+from AddonControl import Addon, Repository
 import urllib2
 from BeautifulSoup import BeautifulSoup
 import json
-from AddonControl import Addon, Repository
-import os
 from zipfile import ZipFile
-from cStringIO import StringIO
 import sys
+import shutil
+import os
+from cStringIO import StringIO
 
 # ankiqt stuff
 import aqt
@@ -21,7 +22,6 @@ class AnkiwebAddon(Addon):
 
     # TODO refactor
     def install(self, path):
-        print path
         ret = download(aqt.mw, str(self.codeNumber))
         if not ret:
             return # TODO error
@@ -34,10 +34,10 @@ class AnkiwebAddon(Addon):
             try:
                 open(path, "w").write(data)
             except:
-                print "sheeeeiiiiitttt" # TODO vulgar
+                print "Error somewhere"
             showInfo(_("Download successful. Please restart Anki."))
-            installed = True
-            installed_path = path
+            self.installed = True
+            self.installed_path = os.path.dirname(path)
             return
 
         # .zip file
@@ -55,9 +55,10 @@ class AnkiwebAddon(Addon):
         self.installed_path = path
 
     def remove(self):
-        print 'Not yet implemented'
-        # remove any files the plugin installs
-        # what else can plugins change that we can track?
+        if self.installed:
+            shutil.rmtree(self.installed_path)
+            self.installed = False
+        # TODO what else can plugins change that we can track?
 
     # TODO don't be stupid about this
     def update(self):
@@ -71,7 +72,6 @@ class AnkiwebAddon(Addon):
         # we don't care about the addons menu, we have our own
         print "Loading ", self.name
         sys.path.insert(0, self.installed_path)
-        print sys.path
         for f in self.files():
             try:
                 __import__(f.replace(".py",""))

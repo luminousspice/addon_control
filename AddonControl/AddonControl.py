@@ -64,6 +64,9 @@ class AddonControl(object):
         self.repositories = []
         self.addons_folder = addons_folder
 
+    def save_state(self):
+        dump_data(self)
+
     def update_repos(self):
         for repo in self.repositories:
             repo.update_addon_list()
@@ -106,6 +109,7 @@ class AddonControl(object):
         return matches
     
     def load_addons(self):
+        print map(lambda a: a.name, self.installed_addons())
         for addon in self.installed_addons():
             addon.load()
 
@@ -118,7 +122,4 @@ def dump_data(controller):
 def load_data(from_where):
     with open(from_where, 'rb') as f:
         control = pickle.load(f)
-        for addon in control.all_addons():
-            print addon.name
-            print addon.installed
         return control
