@@ -35,7 +35,6 @@ class AnkiwebAddon(Addon):
                 open(path, "w").write(data)
             except:
                 print "Error somewhere"
-            showInfo(_("Download successful. Please restart Anki."))
             self.installed = True
             self.installed_path = os.path.dirname(path)
             return
@@ -50,7 +49,6 @@ class AnkiwebAddon(Addon):
             # write
             z.extract(n, base)
 
-        showInfo(_("Download successful. Please restart Anki."))
         self.installed = True
         self.installed_path = path
 
