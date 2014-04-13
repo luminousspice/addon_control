@@ -34,3 +34,4 @@ Todo
   active.
 * Add update functionality to UI and to Ankiweb repo
 * Add support when installing from text files
+* Use anki's profiles to store data instead of pickling ourselves
