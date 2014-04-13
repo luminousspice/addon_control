@@ -18,7 +18,7 @@ through a (poor) UI or a text file
 
 Usage
 -----
-To install AddonControl, clone this repository and copy AddonControl.py and the
+To install AddonControl, clone this repository and copy addonControl.py and the
 AddonControl directory into the Anki data storage directory (~/Documents/Anki on
 mac)
 
