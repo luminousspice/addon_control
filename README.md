@@ -22,8 +22,8 @@ To install AddonControl, clone this repository and copy AddonControl.py and the
 AddonControl directory into the Anki data storage directory (~/Documents/Anki on
 mac)
 
-Details
--------
+Start Anki, you should see a new menu item under Tools called AddonControl
+
 To use the install from text file feature, create a text file containing a
 complete addon name on each line. AddonControl will install the first addon it
 finds with a matching name
