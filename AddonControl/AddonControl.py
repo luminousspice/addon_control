@@ -71,6 +71,10 @@ class AddonControl(object):
         for repo in self.repositories:
             repo.update_addon_list()
 
+    def load_addons(self):
+        for addon in self.installed_addons():
+            addon.load()
+
     def install_addon(self, addon):
         # these paths don't reall have to be too sane
         nicer_name = "".join(x for x in addon.name if x.isalnum())
@@ -107,10 +111,18 @@ class AddonControl(object):
             if re.search(".*?".join(search_name.lower()), addon.name.lower()):
                 matches.append(addon)
         return matches
+
+    # makes sure addons with a particular name are installed
+    # useful for loading addons from file
+    def ensure_installed(self, addon_name):
+        for addon in self.all_addons():
+            if addon.name == addon_name:
+                if not addon.installed:
+                    self.install_addon(addon)
+                return True # success
+        return False
     
-    def load_addons(self):
-        for addon in self.installed_addons():
-            addon.load()
+    
 
 # saving state
 # dumps data controller's directory

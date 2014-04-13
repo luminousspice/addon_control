@@ -95,6 +95,7 @@ class AddonControlGUI(QtGui.QWidget):
         self.filter_field.setText('')
 
         aqt.mw.progress.finish()
+        aqt.utils.showInfo("Installed plugin")
     
     def remove_selected(self):
         aqt.mw.progress.start(immediate=True, label='Removing Addon')
